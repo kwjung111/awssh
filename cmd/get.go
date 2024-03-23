@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"aws"
-	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -13,8 +12,15 @@ var getCmd = &cobra.Command{
 	Short: "Get your EC2 infos with your profile",
 	Long:  `Get your EC2 infos : name, private ip - with your profile`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("get called")
-		aws.GetEc2List()
+		if len(args) == 0 {
+			aws.GetEc2List()
+			return
+		}
+
+		if len(args) == 1 {
+			aws.GetEc2List()
+		}
+
 	},
 }
 

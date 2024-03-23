@@ -24,11 +24,16 @@ var configCmd = &cobra.Command{
 		profile, _ := reader.ReadString('\n')
 		profile = strings.TrimSpace(profile)
 
+		fmt.Println("Enter your default key file location : ")
+		keyFile, _ := reader.ReadString('\n')
+		keyFile = strings.TrimSpace(keyFile)
+
 		viper.Set("profile", profile)
+		viper.Set("keyFile", keyFile)
 
 		err := viper.WriteConfigAs("config.yaml")
 		if err != nil {
-			fmt.Println("Error saving config:", err)
+			fmt.Println("Error while saving config:", err)
 			return
 		}
 

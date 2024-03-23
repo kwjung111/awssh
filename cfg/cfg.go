@@ -8,8 +8,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+// define default value
 type Config struct {
 	Profile string
+	KeyFile string
+	Port    int
 }
 
 var once sync.Once
@@ -18,6 +21,7 @@ var conf Config
 
 func InitCfgManager() *Config {
 
+	//TODO modify path
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -29,6 +33,8 @@ func InitCfgManager() *Config {
 
 			// defualt setting
 			viper.Set("profile", "")
+			viper.Set("keyFile", "key.pem")
+			viper.Set("port", 22)
 
 			if err := viper.SafeWriteConfig(); err != nil {
 				log.Fatalf("Error creating config file, %s", err)
@@ -39,6 +45,8 @@ func InitCfgManager() *Config {
 	}
 
 	conf.Profile = viper.GetString("profile")
+	conf.KeyFile = viper.GetString("keyFile")
+	conf.Port = viper.GetInt("port")
 
 	return &conf
 }
@@ -48,4 +56,30 @@ func GetConf() *Config {
 		InitCfgManager()
 	})
 	return &conf
+}
+
+func SaveItem(vip *viper.Viper, name string) error {
+
+	ConfigureViperDefaults(vip)
+	err := vip.WriteConfigAs(name)
+	if err != nil {
+		return fmt.Errorf("failed to save configuration: %w", err)
+	}
+
+	fmt.Printf("config saved : %s\n", name)
+	return nil
+}
+
+func LoadItem(name string) *viper.Viper {
+
+	vip := viper.New()
+	ConfigureViperDefaults(vip)
+	vip.SetConfigFile(name) //no extension
+
+	return vip
+}
+
+func ConfigureViperDefaults(vip *viper.Viper) {
+	vip.AddConfigPath(".")
+	vip.SetConfigType("yaml")
 }
